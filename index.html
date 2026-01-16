@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детский отдых в Нижегородской области</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bookman+Old+Style:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Bookman Old Style', serif; }
+        body { 
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%); 
+            color: #333; 
+            padding: 20px; 
+            min-height: 100vh;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 25px;
+        }
+        .student-info {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #1a3a8f;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            font-family: 'Bookman Old Style', serif;
+        }
+        .student-info h2 {
+            color: #1a3a8f;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .student-info p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 5px;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .header { 
+            grid-column: 1 / -1; 
+            text-align: center; 
+            margin-bottom: 20px;
+            padding: 25px;
+            background: linear-gradient(90deg, #1a3a8f 0%, #2d55b8 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08); 
+            transition: transform 0.3s;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-title { 
+            font-size: 1.5rem; 
+            color: #1a3a8f; 
+            margin-bottom: 20px; 
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eef2ff;
+            font-weight: 700;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .chart-container { 
+            position: relative; 
+            height: 300px; 
+            margin-top: 15px;
+        }
+        .highlight-box {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .highlight-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid #2d55b8;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .highlight-value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #1a3a8f;
+            margin: 10px 0;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .highlight-label {
+            color: #666;
+            font-size: 1rem;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .trend-up { color: #4CAF50; font-weight: 600; }
+        .trend-down { color: #F44336; font-weight: 600; }
+        .trend-neutral { color: #FF9800; font-weight: 600; }
+        .control-panel {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #eef2ff;
+            color: #1a3a8f;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: #1a3a8f;
+            color: white;
+        }
+        .export-section {
+            display: flex;
+            gap: 10px;
+        }
+        .export-btn {
+            padding: 12px 24px;
+            border: none;
+            background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .export-btn:hover {
+            background: linear-gradient(90deg, #45a049 0%, #3d8b40 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        .export-btn.pdf {
+            background: linear-gradient(90deg, #F44336 0%, #d32f2f 100%);
+        }
+        .export-btn.pdf:hover {
+            background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+        }
+        .comparison-table {
+            grid-column: 1 / -1;
+            overflow-x: auto;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            font-family: 'Bookman Old Style', serif;
+        }
+        .comparison-table th {
+            background: #1a3a8f;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .comparison-table tr:hover {
+            background-color: #f0f4ff;
+        }
+        .conclusions-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #1a3a8f 0%, #2d55b8 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 10px;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .conclusions-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+            font-weight: 700;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .conclusions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .conclusion-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .conclusion-item h4 {
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.2rem;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .conclusion-item p {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.95rem;
+            border-top: 1px solid #ddd;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .sources {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .sources a {
+            color: #1a3a8f;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 600;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .sources a:hover {
+            color: #2d55b8;
+            text-decoration: underline;
+        }
+        .sources-list {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+            font-family: 'Bookman Old Style', serif;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #eef2ff;
+            border-top: 5px solid #1a3a8f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .chart-container { height: 250px; }
+            .control-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-section, .export-section {
+                width: 100%;
+                justify-content: center;
+            }
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+            .conclusions-list {
+                grid-template-columns: 1fr;
+            }
+            .sources-list {
+                align-items: center;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .header p {
+                font-size: 1rem;
+            }
+            .card-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <h3>Создание PDF-отчета...</h3>
+        <p>Пожалуйста, подождите. Это может занять несколько секунд.</p>
+    </div>
+
+    <div class="container" id="dashboardContent">
+        <!-- Информация о студенте -->
+        <div class="student-info">
+            <h2>Учебная работа</h2>
+            <p><strong>Дисциплина:</strong> "Подготовка вожатых в детских оздоровительных и профильных лагерях"</p>
+            <p><strong>Студент:</strong> Путило Анастасия Александровна</p>
+            <p><strong>Курс:</strong> 2 курс, заочное обучение</p>
+            <p><strong>Группа:</strong> ОРМ-Б-0-З-2024-А</p>
+            <p><strong>Тема работы:</strong> Аналитический мониторинг организации летнего отдыха детей в Нижегородской области (2023-2025 гг.)</p>
+        </div>
+
+        <div class="header">
+            <h1>Организация летнего отдыха детей в Нижегородской области</h1>
+            <p>Динамика ключевых показателей за 2023-2025 годы</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="filter-section">
+                <button class="filter-btn active" onclick="filterCharts('all')">Все показатели</button>
+                <button class="filter-btn" onclick="filterCharts('children')">Дети и лагеря</button>
+                <button class="filter-btn" onclick="filterCharts('finance')">Финансирование</button>
+                <button class="filter-btn" onclick="filterCharts('personnel')">Персонал</button>
+                <button class="filter-btn" onclick="filterCharts('inclusive')">Инклюзивная среда</button>
+            </div>
+            <div class="export-section">
+                <button class="export-btn" onclick="saveAsImage()">
+                    Сохранить как изображение
+                </button>
+                <button class="export-btn pdf" onclick="saveAsPDF()">
+                    Сохранить в PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-item">
+                <div class="highlight-label">Всего детей отдохнуло (2025)</div>
+                <div class="highlight-value">98,9 тыс.</div>
+                <div class="trend-up">▲ +3,1% к 2024</div>
+            </div>
+            <div class="highlight-item">
+                <div class="highlight-label">Господдержка (2025)</div>
+                <div class="highlight-value">79,6%</div>
+                <div>путевок с компенсацией</div>
+            </div>
+            <div class="highlight-item">
+                <div class="highlight-label">Дети с ОВЗ (2025)</div>
+                <div class="highlight-value">2,4 тыс.</div>
+                <div>2,4% от общего числа</div>
+            </div>
+            <div class="highlight-item">
+                <div class="highlight-label">Персонал (2025)</div>
+                <div class="highlight-value">18,6 тыс.</div>
+                <div class="trend-up">▲ +4,5% к 2024</div>
+            </div>
+        </div>
+
+        <!-- Сравнительная таблица -->
+        <div class="card comparison-table" data-category="all">
+            <h3 class="card-title">Сравнительный анализ показателей (2023-2025)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>2023 год</th>
+                            <th>2024 год</th>
+                            <th>2025 год</th>
+                            <th>Динамика 2025/2024</th>
+                            <th>Общая тенденция</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Всего детей</strong></td>
+                            <td>97,5 тыс.</td>
+                            <td>95,9 тыс.</td>
+                            <td>98,9 тыс.</td>
+                            <td><span class="trend-up">▲ +3,1%</span></td>
+                            <td>Восстановление после спада</td>
+                        </tr>
+                        <tr>
+                            <td>Сезонные лагеря</td>
+                            <td>92,7 тыс. (95,1%)</td>
+                            <td>90,6 тыс. (94,5%)</td>
+                            <td>93,5 тыс. (94,5%)</td>
+                            <td><span class="trend-up">▲ +3,2%</span></td>
+                            <td>Стабильная структура (~95%)</td>
+                        </tr>
+                        <tr>
+                            <td>Круглогодичные лагеря</td>
+                            <td>4,1 тыс. (4,2%)</td>
+                            <td>4,3 тыс. (4,5%)</td>
+                            <td>4,5 тыс. (4,6%)</td>
+                            <td><span class="trend-up">▲ +4,7%</span></td>
+                            <td>Постепенный рост доли</td>
+                        </tr>
+                        <tr>
+                            <td>Палаточные лагеря</td>
+                            <td>732 (0,8%)</td>
+                            <td>~1 000 (1,0%)</td>
+                            <td>~900 (0,9%)</td>
+                            <td><span class="trend-down">▼ -10%</span></td>
+                            <td>Небольшой стабильный сегмент</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Финансирование</strong></td>
+                            <td>48,5% платных путевок</td>
+                            <td>15,3% платных путевок</td>
+                            <td>20,4% платных путевок</td>
+                            <td><span class="trend-up">▲ +5,1 п.п.</span></td>
+                            <td>Резкий рост господдержки в 2024</td>
+                        </tr>
+                        <tr>
+                            <td>Дети с ОВЗ и инвалиды</td>
+                            <td>2,9 тыс. (3,0%)</td>
+                            <td>2,0 тыс. (2,1%)</td>
+                            <td>2,4 тыс. (2,4%)</td>
+                            <td><span class="trend-up">▲ +20%</span></td>
+                            <td>Частичное восстановление после спада</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Персонал</strong></td>
+                            <td>17,9 тыс.</td>
+                            <td>17,8 тыс.</td>
+                            <td>18,6 тыс.</td>
+                            <td><span class="trend-up">▲ +4,5%</span></td>
+                            <td>Рост в 2025 году</td>
+                        </tr>
+                        <tr>
+                            <td>Педагоги</td>
+                            <td>11,1 тыс. (62,0%)</td>
+                            <td>10,9 тыс. (61,2%)</td>
+                            <td>11,4 тыс. (61,3%)</td>
+                            <td><span class="trend-up">▲ +4,6%</span></td>
+                            <td>Стабильная доля (~62%)</td>
+                        </tr>
+                        <tr>
+                            <td>Вожатые</td>
+                            <td>1,2 тыс. (6,7%)</td>
+                            <td>1,1 тыс. (6,2%)</td>
+                            <td>1,2 тыс. (6,5%)</td>
+                            <td><span class="trend-up">▲ +9,1%</span></td>
+                            <td>Стабильная доля (~6-7%)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Основные графики -->
+        <div class="card chart-card" data-category="children">
+            <h3 class="card-title">Динамика числа отдохнувших детей</h3>
+            <div class="chart-container">
+                <canvas id="childrenChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card" data-category="children">
+            <h3 class="card-title">Структура лагерей по типам (2025 г.)</h3>
+            <div class="chart-container">
+                <canvas id="campTypesChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card" data-category="finance">
+            <h3 class="card-title">Финансовая доступность: оплата путевок</h3>
+            <div class="chart-container">
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card" data-category="inclusive">
+            <h3 class="card-title">Дети с ОВЗ и инвалидностью</h3>
+            <div class="chart-container">
+                <canvas id="inclusiveChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card" data-category="personnel">
+            <h3 class="card-title">Динамика численности персонала</h3>
+            <div class="chart-container">
+                <canvas id="personnelChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card" data-category="personnel">
+            <h3 class="card-title">Структура персонала (2025 г.)</h3>
+            <div class="chart-container">
+                <canvas id="personnelStructureChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Выводы и рекомендации -->
+        <div class="conclusions-card" data-category="all">
+            <h3 class="conclusions-title">Ключевые выводы и аналитика</h3>
+            <div class="conclusions-list">
+                <div class="conclusion-item">
+                    <h4>Положительная динамика восстановления</h4>
+                    <p>После снижения числа отдыхающих детей в 2024 году (-1,6%) в 2025 году наблюдается рост на +3,1%. Это свидетельствует об успешных мерах по восстановлению системы детского отдыха.</p>
+                </div>
+                <div class="conclusion-item">
+                    <h4>Революция в финансировании</h4>
+                    <p>Произошло кардинальное изменение модели финансирования: доля полностью платных путевок сократилась с 48,5% до 20,4%. Значительное увеличение государственной поддержки делает отдых доступнее для семей.</p>
+                </div>
+                <div class="conclusion-item">
+                    <h4>Развитие инклюзивной среды</h4>
+                    <p>В лагерях ежегодно отдыхает 2-3 тысячи детей с ОВЗ и инвалидностью. После снижения в 2024 году в 2025 году наблюдается рост на 20%, что указывает на восстановление программ инклюзивного отдыха.</p>
+                </div>
+                <div class="conclusion-item">
+                    <h4>Оптимизация кадрового обеспечения</h4>
+                    <p>В 2025 году численность персонала выросла на 4,5%, что коррелирует с увеличением числа детей. Стабильное соотношение педагогов (~62%) и вожатых (~6%) говорит об отработанных стандартах комплектования.</p>
+                </div>
+                <div class="conclusion-item">
+                    <h4>Стабильность структуры лагерей</h4>
+                    <p>Более 94% детей отдыхает в сезонных стационарных лагерях. Круглогодичные лагеря демонстрируют постепенный рост (с 4,2% до 4,6%), что может указывать на развитие круглогодичных программ.</p>
+                </div>
+                <div class="conclusion-item">
+                    <h4>Рекомендации для развития</h4>
+                    <p>1. Поддержать тренд роста госфинансирования.<br>
+                       2. Развивать инклюзивные программы для детей с ОВЗ.<br>
+                       3. Рассмотреть увеличение доли круглогодичных лагерей.<br>
+                       4. Мониторить качество при росте количества детей.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Источники данных:</p>
+            <div class="sources">
+                <div class="sources-list">
+                    <a href="https://52.rosstat.gov.ru/folder/35631/document/222746" target="_blank" rel="noopener noreferrer">
+                        Статистический отчет 2023 года
+                    </a>
+                    <a href="https://52.rosstat.gov.ru/storage/mediabank/Организация%20летнего%20отдыха%20и%20оздоровления%20детей%20в%20Нижегородской%20области%20(18%20ноября).pdf" target="_blank" rel="noopener noreferrer">
+                        Статистический отчет 2024 года
+                    </a>
+                    <a href="https://52.rosstat.gov.ru/folder/35631/document/271586" target="_blank" rel="noopener noreferrer">
+                        Статистический отчет 2025 года
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные для графиков
+        const years = ['2023', '2024', '2025'];
+        
+        const childrenData = {
+            total: [97500, 95900, 98900],
+            seasonal: [92700, 90600, 93500],
+            yearRound: [4100, 4300, 4500],
+            tent: [732, 1000, 900]
+        };
+        
+        const paymentData = {
+            paidByParents: [47400, 14700, 20200],
+            partiallyPaid: [null, 33000, 43300],
+            percentagePaid: [48.5, 15.3, 20.4]
+        };
+        
+        const inclusiveData = {
+            disabilities: [2100, 1500, 1900],
+            disabled: [800, 500, 500],
+            total: [2900, 2000, 2400]
+        };
+        
+        const personnelData = {
+            total: [17900, 17800, 18600],
+            teachers: [11100, 10900, 11400],
+            counselors: [1200, 1100, 1200],
+            medical: [900, 900, 900]
+        };
+
+        // Инициализация графиков
+        let charts = {};
+        
+        function initCharts() {
+            // График 1: Динамика числа детей
+            const childrenCtx = document.getElementById('childrenChart').getContext('2d');
+            charts.childrenChart = new Chart(childrenCtx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Всего детей',
+                            data: childrenData.total,
+                            borderColor: '#1a3a8f',
+                            backgroundColor: 'rgba(26, 58, 143, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Сезонные лагеря',
+                            data: childrenData.seasonal,
+                            borderColor: '#4CAF50',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        },
+                        {
+                            label: 'Круглогодичные',
+                            data: childrenData.yearRound,
+                            borderColor: '#FF9800',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} чел.`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 85000,
+                            title: {
+                                display: true,
+                                text: 'Количество детей'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000) + ' тыс.';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // График 2: Типы лагерей (2025)
+            const campTypesCtx = document.getElementById('campTypesChart').getContext('2d');
+            charts.campTypesChart = new Chart(campTypesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Сезонные стационарные', 'Круглогодичные', 'Палаточные'],
+                    datasets: [{
+                        data: [childrenData.seasonal[2], childrenData.yearRound[2], childrenData.tent[2]],
+                        backgroundColor: ['#4CAF50', '#FF9800', '#9C27B0'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = childrenData.total[2];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${value.toLocaleString('ru-RU')} чел. (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // График 3: Оплата путевок
+            const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+            charts.paymentChart = new Chart(paymentCtx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Полностью оплачены родителями',
+                            data: paymentData.paidByParents,
+                            backgroundColor: 'rgba(244, 67, 54, 0.7)',
+                            stack: 'stack1'
+                        },
+                        {
+                            label: 'Частично оплачены родителями',
+                            data: paymentData.partiallyPaid,
+                            backgroundColor: 'rgba(255, 152, 0, 0.7)',
+                            stack: 'stack1'
+                        },
+                        {
+                            label: 'Доля платных путевок (%)',
+                            data: paymentData.percentagePaid,
+                            type: 'line',
+                            borderColor: '#1a3a8f',
+                            borderWidth: 3,
+                            fill: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: {
+                            stacked: true,
+                            title: { display: true, text: 'Количество путевок' },
+                            ticks: { callback: v => (v/1000).toFixed(0) + ' тыс.' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 0,
+                            max: 100,
+                            title: { display: true, text: 'Доля, %' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 2) {
+                                        return `Доля: ${context.raw}%`;
+                                    }
+                                    return `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} путевок`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // График 4: Инклюзивная среда
+            const inclusiveCtx = document.getElementById('inclusiveChart').getContext('2d');
+            charts.inclusiveChart = new Chart(inclusiveCtx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'С ограниченными возможностями',
+                            data: inclusiveData.disabilities,
+                            backgroundColor: '#4CAF50'
+                        },
+                        {
+                            label: 'Дети-инвалиды',
+                            data: inclusiveData.disabled,
+                            backgroundColor: '#2196F3'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Количество детей' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                footer: function(tooltipItems) {
+                                    const yearIndex = tooltipItems[0].dataIndex;
+                                    const totalChildren = childrenData.total[yearIndex];
+                                    const inclusiveTotal = inclusiveData.total[yearIndex];
+                                    const percentage = ((inclusiveTotal / totalChildren) * 100).toFixed(1);
+                                    return `Всего детей с ОВЗ: ${inclusiveTotal.toLocaleString('ru-RU')} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // График 5: Динамика персонала
+            const personnelCtx = document.getElementById('personnelChart').getContext('2d');
+            charts.personnelChart = new Chart(personnelCtx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Всего персонала',
+                            data: personnelData.total,
+                            borderColor: '#1a3a8f',
+                            backgroundColor: 'rgba(26, 58, 143, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Педагоги',
+                            data: personnelData.teachers,
+                            borderColor: '#4CAF50',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Вожатые',
+                            data: personnelData.counselors,
+                            borderColor: '#FF9800',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 15000,
+                            title: { display: true, text: 'Количество персонала' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} чел.`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // График 6: Структура персонала
+            const personnelStructureCtx = document.getElementById('personnelStructureChart').getContext('2d');
+            charts.personnelStructureChart = new Chart(personnelStructureCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Педагоги', 'Вожатые', 'Медперсонал', 'Прочий персонал'],
+                    datasets: [{
+                        data: [
+                            personnelData.teachers[2],
+                            personnelData.counselors[2],
+                            personnelData.medical[2],
+                            personnelData.total[2] - personnelData.teachers[2] - personnelData.counselors[2] - personnelData.medical[2]
+                        ],
+                        backgroundColor: ['#4CAF50', '#FF9800', '#F44336', '#9C27B0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = personnelData.total[2];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${value.toLocaleString('ru-RU')} чел. (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Функция фильтрации графиков по категориям
+        function filterCharts(category) {
+            // Обновляем активную кнопку
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(getCategoryName(category))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Показываем/скрываем графики
+            document.querySelectorAll('.chart-card, .comparison-table, .conclusions-card').forEach(element => {
+                if (category === 'all' || element.dataset.category === category) {
+                    element.style.display = 'block';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        }
+        
+        function getCategoryName(category) {
+            const names = {
+                'all': 'Все показатели',
+                'children': 'Дети и лагеря',
+                'finance': 'Финансирование',
+                'personnel': 'Персонал',
+                'inclusive': 'Инклюзивная среда'
+            };
+            return names[category] || category;
+        }
+
+        // Функция для сохранения как изображение
+        function saveAsImage() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.querySelector('h3').textContent = 'Создание изображения...';
+            
+            // Даем время на рендеринг
+            setTimeout(() => {
+                html2canvas(document.getElementById('dashboardContent'), {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#f5f7fa'
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Дашборд_детский_отдых_${new Date().toISOString().split('T')[0]}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    loadingOverlay.style.display = 'none';
+                }).catch(error => {
+                    console.error('Ошибка создания изображения:', error);
+                    alert('Ошибка при создании изображения. Пожалуйста, попробуйте снова.');
+                    loadingOverlay.style.display = 'none';
+                });
+            }, 500);
+        }
+
+        // Функция для сохранения в PDF
+        async function saveAsPDF() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.querySelector('h3').textContent = 'Создание PDF-отчета...';
+            
+            try {
+                // Создаем отдельные элементы для каждой страницы PDF
+                const elements = [
+                    // Первая страница: заголовок и студенческая информация
+                    createPDFPage1(),
+                    // Вторая страница: сравнительная таблица и первые графики
+                    createPDFPage2(),
+                    // Третья страница: оставшиеся графики
+                    createPDFPage3(),
+                    // Четвертая страница: выводы и источники
+                    createPDFPage4()
+                ];
+                
+                // Создаем PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = 210; // A4 ширина в мм
+                const pageHeight = 297; // A4 высота в мм
+                const margin = 15; // Отступы от краев
+                
+                // Добавляем каждую страницу в PDF
+                for (let i = 0; i < elements.length; i++) {
+                    if (i > 0) {
+                        pdf.addPage();
+                    }
+                    
+                    const tempContainer = document.createElement('div');
+                    tempContainer.style.position = 'absolute';
+                    tempContainer.style.left = '-9999px';
+                    tempContainer.style.top = '0';
+                    tempContainer.style.width = (pageWidth - margin * 2) + 'mm';
+                    tempContainer.style.backgroundColor = 'white';
+                    tempContainer.style.padding = '10px';
+                    tempContainer.style.boxSizing = 'border-box';
+                    document.body.appendChild(tempContainer);
+                    
+                    tempContainer.appendChild(elements[i]);
+                    
+                    // Ждем загрузки ресурсов
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Создаем изображение для страницы
+                    const canvas = await html2canvas(tempContainer, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: 'white',
+                        width: tempContainer.offsetWidth,
+                        windowWidth: tempContainer.offsetWidth,
+                        onclone: function(clonedDoc) {
+                            // Убеждаемся, что все стили применены
+                            const style = clonedDoc.createElement('style');
+                            style.textContent = `
+                                * { 
+                                    font-family: 'Bookman Old Style', serif !important; 
+                                    box-sizing: border-box;
+                                }
+                                body { 
+                                    margin: 0; 
+                                    padding: 0; 
+                                    background: white;
+                                    font-family: 'Bookman Old Style', serif;
+                                }
+                                .card { 
+                                    background: white !important; 
+                                    border-radius: 10px !important;
+                                    box-shadow: 0 3px 10px rgba(0,0,0,0.1) !important;
+                                    margin-bottom: 15px !important;
+                                    break-inside: avoid !important;
+                                }
+                                .chart-container canvas {
+                                    max-height: 200px !important;
+                                }
+                                table {
+                                    font-size: 9px !important;
+                                }
+                                h1 { font-size: 20px !important; }
+                                h2 { font-size: 16px !important; }
+                                h3 { font-size: 14px !important; }
+                                p, li, td { font-size: 10px !important; }
+                            `;
+                            clonedDoc.head.appendChild(style);
+                        }
+                    });
+                    
+                    // Удаляем временный контейнер
+                    document.body.removeChild(tempContainer);
+                    
+                    // Добавляем изображение в PDF
+                    const imgWidth = pageWidth - margin * 2;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    // Проверяем, помещается ли изображение на страницу
+                    const availableHeight = pageHeight - margin * 2;
+                    const finalHeight = Math.min(imgHeight, availableHeight);
+                    
+                    pdf.addImage(
+                        canvas.toDataURL('image/jpeg', 0.95), 
+                        'JPEG', 
+                        margin, 
+                        margin, 
+                        imgWidth, 
+                        finalHeight
+                    );
+                    
+                    // Добавляем номер страницы
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(
+                        `Страница ${i + 1} из ${elements.length}`, 
+                        pageWidth / 2, 
+                        pageHeight - 10, 
+                        { align: 'center' }
+                    );
+                }
+                
+                // Сохраняем PDF
+                pdf.save(`Аналитический_отчет_Путило_А.А._${new Date().toISOString().split('T')[0]}.pdf`);
+                
+                loadingOverlay.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Ошибка создания PDF:', error);
+                alert('Ошибка при создании PDF. Пожалуйста, попробуйте снова.');
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        // Функции для создания страниц PDF
+        function createPDFPage1() {
+            const page = document.createElement('div');
+            page.style.padding = '10px';
+            page.style.fontFamily = 'Bookman Old Style, serif';
+            
+            // Заголовок отчета
+            const header = document.createElement('div');
+            header.style.textAlign = 'center';
+            header.style.marginBottom = '20px';
+            header.style.paddingBottom = '15px';
+            header.style.borderBottom = '2px solid #1a3a8f';
+            header.innerHTML = `
+                <h1 style="color: #1a3a8f; margin-bottom: 10px; font-size: 22px;">Организация летнего отдыха детей в Нижегородской области</h1>
+                <h2 style="color: #666; margin-bottom: 15px; font-size: 16px;">Аналитический отчет за 2023-2025 годы</h2>
+                <p style="color: #888; font-size: 12px;">Дата создания: ${new Date().toLocaleDateString('ru-RU')}</p>
+            `;
+            page.appendChild(header);
+            
+            // Информация о студенте
+            const studentInfo = document.createElement('div');
+            studentInfo.style.backgroundColor = '#f8f9fa';
+            studentInfo.style.padding = '15px';
+            studentInfo.style.borderRadius = '8px';
+            studentInfo.style.marginBottom = '20px';
+            studentInfo.style.borderLeft = '4px solid #1a3a8f';
+            studentInfo.innerHTML = `
+                <h3 style="color: #1a3a8f; margin-bottom: 10px; font-size: 16px;">Учебная работа</h3>
+                <p style="margin-bottom: 5px;"><strong>Дисциплина:</strong> "Подготовка вожатых в детских оздоровительных и профильных лагерях"</p>
+                <p style="margin-bottom: 5px;"><strong>Студент:</strong> Путило Анастасия Александровна</p>
+                <p style="margin-bottom: 5px;"><strong>Курс:</strong> 2 курс, заочное обучение</p>
+                <p style="margin-bottom: 5px;"><strong>Группа:</strong> ОРМ-Б-0-З-2024-А</p>
+                <p><strong>Тема работы:</strong> Аналитический мониторинг организации летнего отдыха детей в Нижегородской области (2023-2025 гг.)</p>
+            `;
+            page.appendChild(studentInfo);
+            
+            // Исполнительное резюме
+            const executiveSummary = document.createElement('div');
+            executiveSummary.style.backgroundColor = '#f0f4ff';
+            executiveSummary.style.padding = '15px';
+            executiveSummary.style.borderRadius = '8px';
+            executiveSummary.style.marginBottom = '20px';
+            executiveSummary.innerHTML = `
+                <h3 style="color: #1a3a8f; margin-bottom: 10px; font-size: 16px;">Исполнительное резюме</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <h4 style="color: #1a3a8f; margin-bottom: 5px; font-size: 14px;">Основные достижения:</h4>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 12px;">
+                            <li>Восстановление числа отдыхающих детей (+3,1% в 2025)</li>
+                            <li>Увеличение господдержки до 79,6% путевок</li>
+                            <li>Рост кадрового обеспечения (+4,5% персонала)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #1a3a8f; margin-bottom: 5px; font-size: 14px;">Ключевые тренды:</h4>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 12px;">
+                            <li>Кардинальное изменение модели финансирования</li>
+                            <li>Стабильность структуры лагерей (94,5% сезонные)</li>
+                            <li>Развитие инклюзивной среды (2,4 тыс. детей с ОВЗ)</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            page.appendChild(executiveSummary);
+            
+            // Ключевые показатели
+            const keyMetrics = document.createElement('div');
+            keyMetrics.innerHTML = `
+                <h3 style="color: #1a3a8f; margin-bottom: 15px; font-size: 16px;">Ключевые показатели (2025 год)</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div style="background: white; padding: 10px; border-radius: 6px; text-align: center; border-top: 3px solid #2d55b8;">
+                        <div style="font-size: 11px; color: #666;">Всего детей отдохнуло</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1a3a8f;">98,9 тыс.</div>
+                        <div style="color: #4CAF50; font-size: 11px;">▲ +3,1% к 2024</div>
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px; text-align: center; border-top: 3px solid #2d55b8;">
+                        <div style="font-size: 11px; color: #666;">Господдержка</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1a3a8f;">79,6%</div>
+                        <div style="font-size: 11px;">путевок с компенсацией</div>
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px; text-align: center; border-top: 3px solid #2d55b8;">
+                        <div style="font-size: 11px; color: #666;">Дети с ОВЗ</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1a3a8f;">2,4 тыс.</div>
+                        <div style="font-size: 11px;">2,4% от общего числа</div>
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px; text-align: center; border-top: 3px solid #2d55b8;">
+                        <div style="font-size: 11px; color: #666;">Персонал</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1a3a8f;">18,6 тыс.</div>
+                        <div style="color: #4CAF50; font-size: 11px;">▲ +4,5% к 2024</div>
+                    </div>
+                </div>
+            `;
+            page.appendChild(keyMetrics);
+            
+            return page;
+        }
+
+        function createPDFPage2() {
+            const page = document.createElement('div');
+            page.style.padding = '10px';
+            page.style.fontFamily = 'Bookman Old Style, serif';
+            
+            // Сравнительная таблица
+            const tableSection = document.createElement('div');
+            tableSection.innerHTML = `
+                <h3 style="color: #1a3a8f; margin-bottom: 15px; font-size: 16px; text-align: center;">Сравнительный анализ показателей (2023-2025)</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
+                        <thead>
+                            <tr style="background: #1a3a8f; color: white;">
+                                <th style="padding: 8px; border: 1px solid #ddd;">Показатель</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">2023 год</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">2024 год</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">2025 год</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Динамика 2025/2024</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Общая тенденция</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Всего детей</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">97,5 тыс.</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">95,9 тыс.</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">98,9 тыс.</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +3,1%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Восстановление после спада</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Сезонные лагеря</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">92,7 тыс. (95,1%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">90,6 тыс. (94,5%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">93,5 тыс. (94,5%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +3,2%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Стабильная структура (~95%)</td>
+                            </tr>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd;">Круглогодичные лагеря</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">4,1 тыс. (4,2%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">4,3 тыс. (4,5%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">4,5 тыс. (4,6%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +4,7%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Постепенный рост доли</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Палаточные лагеря</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">732 (0,8%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">~1 000 (1,0%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">~900 (0,9%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #F44336;">▼ -10%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Небольшой стабильный сегмент</td>
+                            </tr>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Финансирование</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">48,5% платных путевок</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">15,3% платных путевок</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">20,4% платных путевок</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +5,1 п.п.</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Резкий рост господдержки в 2024</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="font-size: 9px; color: #666; margin-top: 10px; text-align: center;">
+                    Продолжение таблицы на следующей странице
+                </p>
+            `;
+            page.appendChild(tableSection);
+            
+            // Первый график
+            const chart1Container = document.createElement('div');
+            chart1Container.style.marginTop = '20px';
+            chart1Container.innerHTML = `
+                <h4 style="color: #1a3a8f; margin-bottom: 10px; font-size: 14px; text-align: center;">Динамика числа отдохнувших детей</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <canvas id="pdfChildrenChart" width="400" height="200"></canvas>
+                </div>
+            `;
+            page.appendChild(chart1Container);
+            
+            return page;
+        }
+
+        function createPDFPage3() {
+            const page = document.createElement('div');
+            page.style.padding = '10px';
+            page.style.fontFamily = 'Bookman Old Style, serif';
+            
+            // Продолжение таблицы
+            const tableContinuation = document.createElement('div');
+            tableContinuation.innerHTML = `
+                <h4 style="color: #1a3a8f; margin-bottom: 10px; font-size: 14px;">Продолжение сравнительного анализа</h4>
+                <div style="overflow-x: auto; margin-bottom: 20px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
+                        <thead>
+                            <tr style="background: #1a3a8f; color: white;">
+                                <th style="padding: 8px; border: 1px solid #ddd;">Показатель</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">2023 год</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">2024 год</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">2025 год</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Динамика 2025/2024</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Общая тенденция</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd;">Дети с ОВЗ и инвалиды</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">2,9 тыс. (3,0%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">2,0 тыс. (2,1%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">2,4 тыс. (2,4%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +20%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Частичное восстановление после спада</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Персонал</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">17,9 тыс.</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">17,8 тыс.</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">18,6 тыс.</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +4,5%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Рост в 2025 году</td>
+                            </tr>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd;">Педагоги</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">11,1 тыс. (62,0%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">10,9 тыс. (61,2%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">11,4 тыс. (61,3%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +4,6%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Стабильная доля (~62%)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Вожатые</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">1,2 тыс. (6,7%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">1,1 тыс. (6,2%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">1,2 тыс. (6,5%)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #4CAF50;">▲ +9,1%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Стабильная доля (~6-7%)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            page.appendChild(tableContinuation);
+            
+            // Графики
+            const chartsSection = document.createElement('div');
+            chartsSection.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <h4 style="color: #1a3a8f; margin-bottom: 10px; font-size: 14px; text-align: center;">Финансовая доступность</h4>
+                        <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <canvas id="pdfPaymentChart" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: #1a3a8f; margin-bottom: 10px; font-size: 14px; text-align: center;">Инклюзивная среда</h4>
+                        <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <canvas id="pdfInclusiveChart" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <h4 style="color: #1a3a8f; margin-bottom: 10px; font-size: 14px; text-align: center;">Динамика персонала</h4>
+                        <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <canvas id="pdfPersonnelChart" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: #1a3a8f; margin-bottom: 10px; font-size: 14px; text-align: center;">Структура лагерей</h4>
+                        <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <canvas id="pdfCampTypesChart" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            `;
+            page.appendChild(chartsSection);
+            
+            return page;
+        }
+
+        function createPDFPage4() {
+            const page = document.createElement('div');
+            page.style.padding = '10px';
+            page.style.fontFamily = 'Bookman Old Style, serif';
+            
+            // Выводы
+            const conclusions = document.createElement('div');
+            conclusions.style.backgroundColor = '#1a3a8f';
+            conclusions.style.color = 'white';
+            conclusions.style.padding = '20px';
+            conclusions.style.borderRadius = '8px';
+            conclusions.style.marginBottom = '20px';
+            conclusions.innerHTML = `
+                <h3 style="margin-bottom: 15px; font-size: 16px; text-align: center;">Ключевые выводы и аналитика</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #4CAF50;">
+                        <h4 style="margin-bottom: 5px; font-size: 13px;">Положительная динамика восстановления</h4>
+                        <p style="font-size: 11px; opacity: 0.9;">После снижения числа отдыхающих детей в 2024 году (-1,6%) в 2025 году наблюдается рост на +3,1%. Это свидетельствует об успешных мерах по восстановлению системы детского отдыха.</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #4CAF50;">
+                        <h4 style="margin-bottom: 5px; font-size: 13px;">Революция в финансировании</h4>
+                        <p style="font-size: 11px; opacity: 0.9;">Произошло кардинальное изменение модели финансирования: доля полностью платных путевок сократилась с 48,5% до 20,4%. Значительное увеличение государственной поддержки делает отдых доступнее для семей.</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #4CAF50;">
+                        <h4 style="margin-bottom: 5px; font-size: 13px;">Развитие инклюзивной среды</h4>
+                        <p style="font-size: 11px; opacity: 0.9;">В лагерях ежегодно отдыхает 2-3 тысячи детей с ОВЗ и инвалидностью. После снижения в 2024 году в 2025 году наблюдается рост на 20%, что указывает на восстановление программ инклюзивного отдыха.</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #4CAF50;">
+                        <h4 style="margin-bottom: 5px; font-size: 13px;">Оптимизация кадрового обеспечения</h4>
+                        <p style="font-size: 11px; opacity: 0.9;">В 2025 году численность персонала выросла на 4,5%, что коррелирует с увеличением числа детей. Стабильное соотношение педагогов (~62%) и вожатых (~6%) говорит об отработанных стандартах комплектования.</p>
+                    </div>
+                </div>
+            `;
+            page.appendChild(conclusions);
+            
+            // Рекомендации
+            const recommendations = document.createElement('div');
+            recommendations.style.backgroundColor = '#e8f5e9';
+            recommendations.style.padding = '15px';
+            recommendations.style.borderRadius = '8px';
+            recommendations.style.marginBottom = '20px';
+            recommendations.style.borderLeft = '4px solid #4CAF50';
+            recommendations.innerHTML = `
+                <h3 style="color: #2e7d32; margin-bottom: 10px; font-size: 16px;">Стратегические рекомендации</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <h4 style="color: #2e7d32; margin-bottom: 5px; font-size: 14px;">Краткосрочные (2026):</h4>
+                        <ol style="margin: 0; padding-left: 20px; font-size: 12px;">
+                            <li>Закрепить рост государственного финансирования</li>
+                            <li>Увеличить охват детей с ОВЗ до 3%</li>
+                            <li>Разработать программы профразвития для вожатых</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 style="color: #2e7d32; margin-bottom: 5px; font-size: 14px;">Среднесрочные (2026-2027):</h4>
+                        <ol style="margin: 0; padding-left: 20px; font-size: 12px;">
+                            <li>Развивать круглогодичные форматы отдыха</li>
+                            <li>Внедрить систему мониторинга качества услуг</li>
+                            <li>Создать региональный стандарт инклюзивного отдыха</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+            page.appendChild(recommendations);
+            
+            // Источники
+            const sources = document.createElement('div');
+            sources.style.backgroundColor = '#f9f9f9';
+            sources.style.padding = '15px';
+            sources.style.borderRadius = '8px';
+            sources.style.fontSize = '11px';
+            sources.innerHTML = `
+                <h4 style="color: #666; margin-bottom: 10px; font-size: 14px;">Источники данных:</h4>
+                <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                    <li>Статистический отчет 2023 года – официальные данные Нижегородстата</li>
+                    <li>Статистический отчет 2024 года – официальные данные Нижегородстата</li>
+                    <li>Статистический отчет 2025 года – официальные данные Нижегородстата</li>
+                </ul>
+            `;
+            page.appendChild(sources);
+            
+            // Подпись
+            const signature = document.createElement('div');
+            signature.style.textAlign = 'center';
+            signature.style.marginTop = '20px';
+            signature.style.paddingTop = '15px';
+            signature.style.borderTop = '1px solid #ddd';
+            signature.style.fontSize = '11px';
+            signature.style.color = '#666';
+            signature.innerHTML = `
+                <p>Аналитический отчет подготовлен студентом 2 курса заочного обучения Путило А.А.</p>
+                <p>Все права на данные принадлежат Нижегородстату</p>
+            `;
+            page.appendChild(signature);
+            
+            return page;
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            filterCharts('all');
+        });
+    </script>
+</body>
+</html>
